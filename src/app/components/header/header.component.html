@@ -1,0 +1,58 @@
+<header class="app-header" (click)="closeMenus()">
+  <div class="header-container">
+    <!-- Logo / Brand -->
+    <div class="brand" (click)="goHome()">
+      <div class="logo">📄</div>
+      <h1>DocEditor</h1>
+    </div>
+
+    <!-- Navigation Menu -->
+    <nav class="nav-menu">
+      <!-- Create Dropdown -->
+      <div class="menu-item dropdown" (click)="$event.stopPropagation()">
+        <button class="menu-btn" (click)="toggleCreate()">
+          Create
+          <span class="chevron" [class.open]="createOpen">▼</span>
+        </button>
+        <div class="dropdown-menu" [class.open]="createOpen">
+          <button class="dropdown-item" (click)="createNewPdf()">
+            <span class="icon">📄</span>
+            <span>New PDF</span>
+          </button>
+          <button class="dropdown-item" (click)="createNewWord()">
+            <span class="icon">📋</span>
+            <span>New Word Document</span>
+          </button>
+          <button class="dropdown-item" (click)="createNewPpt()">
+            <span class="icon">📊</span>
+            <span>New PowerPoint</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Convert Dropdown -->
+      <div class="menu-item dropdown" (click)="$event.stopPropagation()">
+        <button class="menu-btn" (click)="toggleConvert()">
+          Convert
+          <span class="chevron" [class.open]="convertOpen">▼</span>
+        </button>
+        <div class="dropdown-menu" [class.open]="convertOpen">
+          <button class="dropdown-item" (click)="convertPdfToWord()">Convert PDF to Word</button>
+          <button class="dropdown-item" (click)="convertWordToPdf()">Convert Word to PDF</button>
+          <button class="dropdown-item" (click)="convertPdfToJpg()">Convert PDF to JPG</button>
+          <button class="dropdown-item" (click)="convertPdfToPng()">Convert PDF to PNG</button>
+          <button class="dropdown-item" (click)="convertPdfToExcel()">Convert PDF to Excel</button>
+          <button class="dropdown-item" (click)="convertPdfToPpt()">Convert PDF to PPT</button>
+        </div>
+      </div>
+
+      <!-- Documents Link -->
+      <button class="menu-btn" (click)="goToDocuments()">My Documents</button>
+    </nav>
+
+    <!-- Right Actions -->
+    <div class="header-actions">
+      <button class="sign-in-btn">Sign in</button>
+    </div>
+  </div>
+</header>

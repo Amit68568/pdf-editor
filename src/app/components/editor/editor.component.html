@@ -1,0 +1,44 @@
+<div class="editor-container">
+  <!-- Header -->
+  <div class="editor-header">
+    <button class="back-btn" (click)="goBack()" title="Go back">←</button>
+    <div class="header-title">
+      <h1 *ngIf="document">{{ document.name }}</h1>
+      <p *ngIf="document" class="doc-type" [ngClass]="document.type">{{ document.type.toUpperCase() }}</p>
+    </div>
+    <div class="header-actions">
+      <button class="action-btn save" (click)="saveDocument()" [disabled]="isSaving" title="Save changes">
+        {{ isSaving ? '⟳' : '💾' }}
+      </button>
+      <button class="action-btn export" (click)="exportAsPdf()" [disabled]="!document" title="Export as PDF">
+        📄 PDF
+      </button>
+      <button class="action-btn export" (click)="exportAsDocx()" [disabled]="!document" title="Export as Word">
+        📋 DOCX
+      </button>
+    </div>
+  </div>
+
+  <!-- Alerts -->
+  <div *ngIf="errorMessage" class="alert error">
+    {{ errorMessage }}
+  </div>
+  <div *ngIf="successMessage" class="alert success">
+    {{ successMessage }}
+  </div>
+
+  <!-- Editor -->
+  <div class="editor-body">
+    <div *ngIf="isLoading" class="state-message">
+      <p>Loading document...</p>
+    </div>
+
+    <textarea
+      *ngIf="!isLoading && document"
+      class="editor-textarea"
+      [(ngModel)]="editingContent"
+      placeholder="Start editing your document..."
+      spellcheck="true"
+    ></textarea>
+  </div>
+</div>

@@ -1,0 +1,75 @@
+<div class="create-container">
+  <!-- Header -->
+  <div class="create-header">
+    <button class="back-btn" (click)="goBack()">←</button>
+    <h1>Create {{ typeLabels[documentType] }}</h1>
+    <div class="header-spacer"></div>
+  </div>
+
+  <!-- Alerts -->
+  <div *ngIf="errorMessage" class="alert error">
+    {{ errorMessage }}
+  </div>
+  <div *ngIf="successMessage" class="alert success">
+    {{ successMessage }}
+  </div>
+
+  <!-- Create Form -->
+  <div class="create-form">
+    <div class="form-card">
+      <!-- Type Badge -->
+      <div class="type-badge">
+        <span class="icon">{{ typeIcons[documentType] }}</span>
+        <span class="label">{{ typeLabels[documentType] }}</span>
+      </div>
+
+      <!-- Title Input -->
+      <div class="form-group">
+        <label>Document Title</label>
+        <input
+          type="text"
+          [value]="documentTitle"
+          (change)="updateTitle($event)"
+          placeholder="Enter document title..."
+          class="title-input"
+          (keyup.enter)="createDocument()"
+        />
+      </div>
+
+      <!-- Content Preview -->
+      <div class="form-group">
+        <label>Start with content (optional)</label>
+        <textarea
+          [(ngModel)]="documentContent"
+          placeholder="Add initial content here or create blank..."
+          class="content-input"
+        ></textarea>
+      </div>
+
+      <!-- Info Box -->
+      <div class="info-box">
+        <p>💡 You can edit and format your document after creation</p>
+      </div>
+
+      <!-- Actions -->
+      <div class="form-actions">
+        <button class="btn-secondary" (click)="goBack()">Cancel</button>
+        <button class="btn-primary" (click)="createDocument()" [disabled]="isSaving">
+          {{ isSaving ? 'Creating...' : 'Create Document' }}
+        </button>
+      </div>
+    </div>
+
+    <!-- Features -->
+    <div class="features-section">
+      <h3>✨ Features</h3>
+      <ul class="features-list">
+        <li>📝 Full document editing</li>
+        <li>💾 Auto-save functionality</li>
+        <li>📤 Export to multiple formats</li>
+        <li>🔄 Convert between formats</li>
+        <li>☁️ Cloud storage ready</li>
+      </ul>
+    </div>
+  </div>
+</div>

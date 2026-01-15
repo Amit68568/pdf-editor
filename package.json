@@ -4,6 +4,8 @@
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
+    "start:mock": "concurrently \"ng serve\" \"npm run server\"",
+    "server": "json-server --watch db.json --port 3000",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test"
@@ -28,9 +30,14 @@
     "@angular/core": "^21.0.0",
     "@angular/forms": "^21.0.0",
     "@angular/platform-browser": "^21.0.0",
+    "@angular/platform-browser-dynamic": "^21.0.0",
     "@angular/router": "^21.0.0",
     "@ckeditor/ckeditor5-angular": "^11.0.0",
     "@ckeditor/ckeditor5-build-classic": "^41.4.2",
+    "pdfjs-dist": "^4.0.0",
+    "pdf-lib": "^1.17.1",
+    "mammoth": "^1.6.0",
+    "docx": "^8.5.0",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0"
   },
@@ -38,6 +45,8 @@
     "@angular/build": "^21.0.5",
     "@angular/cli": "^21.0.5",
     "@angular/compiler-cli": "^21.0.0",
+    "concurrently": "^8.2.0",
+    "json-server": "^0.17.4",
     "jsdom": "^27.1.0",
     "typescript": "~5.9.2",
     "vitest": "^4.0.8"

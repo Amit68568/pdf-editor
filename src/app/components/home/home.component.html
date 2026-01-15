@@ -1,0 +1,135 @@
+<div class="home-container">
+  <!-- Hero Section -->
+  <section class="hero">
+    <div class="hero-content">
+      <h1 class="hero-title">Create & Edit Documents Online</h1>
+      <p class="hero-subtitle">A beautiful, free, offline-first document editor. No registration. No limits. No ads.</p>
+      
+      <div class="hero-stats">
+        <div class="stat-item" *ngFor="let stat of stats">
+          <div class="stat-number">{{ stat.number }}</div>
+          <div class="stat-label">{{ stat.label }}</div>
+        </div>
+      </div>
+
+      <div class="hero-buttons">
+        <button class="btn btn-primary" (click)="navigateToCreate()">
+          <span class="btn-icon">✨</span>
+          Create New Document
+        </button>
+        <button class="btn btn-secondary" (click)="navigateToDocuments()">
+          <span class="btn-icon">📂</span>
+          My Documents
+        </button>
+      </div>
+    </div>
+
+    <div class="hero-visual">
+      <div class="document-preview">
+        <div class="document-top">
+          <div class="document-line"></div>
+          <div class="document-line short"></div>
+        </div>
+        <div class="document-content">
+          <div class="line"></div>
+          <div class="line"></div>
+          <div class="line short"></div>
+        </div>
+        <div class="document-bottom">
+          <div class="line"></div>
+          <div class="line"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Features Section -->
+  <section class="features">
+    <div class="features-header">
+      <h2>Powerful Features</h2>
+      <p>Everything you need to create, edit, and export documents</p>
+    </div>
+
+    <div class="features-grid">
+      <div class="feature-card" *ngFor="let feature of features">
+        <div class="feature-icon">{{ feature.icon }}</div>
+        <h3 class="feature-title">{{ feature.title }}</h3>
+        <p class="feature-description">{{ feature.description }}</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Why Choose Us Section -->
+  <section class="why-choose-us">
+    <div class="why-content">
+      <h2>Why Choose Our Editor?</h2>
+      
+      <div class="benefits-list">
+        <div class="benefit-item">
+          <div class="benefit-icon">🔒</div>
+          <div class="benefit-text">
+            <h4>Your Privacy Matters</h4>
+            <p>All documents are stored locally on your device. We never access your data.</p>
+          </div>
+        </div>
+
+        <div class="benefit-item">
+          <div class="benefit-icon">⚙️</div>
+          <div class="benefit-text">
+            <h4>Simple & Intuitive</h4>
+            <p>Clean, minimal interface designed for productivity and ease of use.</p>
+          </div>
+        </div>
+
+        <div class="benefit-item">
+          <div class="benefit-icon">🚀</div>
+          <div class="benefit-text">
+            <h4>Always Available</h4>
+            <p>Work offline anytime, anywhere. No connection required to access your documents.</p>
+          </div>
+        </div>
+
+        <div class="benefit-item">
+          <div class="benefit-icon">💰</div>
+          <div class="benefit-text">
+            <h4>Completely Free</h4>
+            <p>No subscriptions, no paywalls, no hidden fees. Use it forever for free.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Format Support Section -->
+  <section class="formats">
+    <h2>Supported Formats</h2>
+    
+    <div class="format-cards">
+      <div class="format-card">
+        <div class="format-icon">📄</div>
+        <h3>PDF</h3>
+        <p>Create and export beautiful PDF documents with professional formatting</p>
+      </div>
+      <div class="format-card">
+        <div class="format-icon">📋</div>
+        <h3>Word (.DOCX)</h3>
+        <p>Generate Word documents that you can further edit in Microsoft Office</p>
+      </div>
+      <div class="format-card">
+        <div class="format-icon">📝</div>
+        <h3>Plain Text</h3>
+        <p>Export as simple text files for maximum compatibility</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA Section -->
+  <section class="cta">
+    <h2>Ready to Get Started?</h2>
+    <p>Create your first document in seconds. No sign up required.</p>
+    <button class="btn btn-large" (click)="navigateToCreate()">
+      <span class="btn-icon">✨</span>
+      Start Creating Now
+    </button>
+  </section>
+</div>

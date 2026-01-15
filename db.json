@@ -1,0 +1,36 @@
+{
+  "documents": [
+    {
+      "id": "2",
+      "name": "Sample Word Document",
+      "type": "doc",
+      "content": "This is a sample Word document for testing. It demonstrates the functionality of the document editor.\n\nYou can:\n- Upload DOCX files\n- Edit content\n- Save changes\n- Export to different formats",
+      "createdAt": "2025-01-14T14:30:00Z",
+      "updatedAt": "2025-01-15T09:15:00Z"
+    },
+    {
+      "id": "3",
+      "name": "Meeting Notes",
+      "type": "doc",
+      "content": "Meeting Date: January 15, 2025\n\nAttendees:\n- John Doe\n- Jane Smith\n- Mike Johnson\n\nTopics Discussed:\n1. Project progress review\n2. Q1 planning\n3. Team assignments\n\nAction Items:\n- Complete frontend by end of week\n- Review API specifications\n- Schedule backend kickoff meeting",
+      "createdAt": "2025-01-15T08:00:00Z",
+      "updatedAt": "2025-01-15T11:30:00Z"
+    },
+    {
+      "name": "Untitled PDF Document",
+      "type": "pdf",
+      "content": "# Untitled PDF Document\n\nStart typing here...",
+      "createdAt": "2026-01-15T05:44:50.943Z",
+      "updatedAt": "2026-01-15T05:44:50.943Z",
+      "id": "k-VKY_I"
+    },
+    {
+      "name": "Untitled PDF Document",
+      "type": "pdf",
+      "content": "# Untitled PDF Document\n\nStart typing here...",
+      "createdAt": "2026-01-15T05:45:32.853Z",
+      "updatedAt": "2026-01-15T05:45:32.853Z",
+      "id": "QhKikOI"
+    }
+  ]
+}
