@@ -4,7 +4,7 @@
     <div class="hero-content">
       <h1 class="hero-title">Create & Edit Documents Online</h1>
       <p class="hero-subtitle">A beautiful, free, offline-first document editor. No registration. No limits. No ads.</p>
-      
+
       <div class="hero-stats">
         <div class="stat-item" *ngFor="let stat of stats">
           <div class="stat-number">{{ stat.number }}</div>
@@ -17,10 +17,11 @@
           <span class="btn-icon">✨</span>
           Create New Document
         </button>
-        <button class="btn btn-secondary" (click)="navigateToDocuments()">
+        <button class="btn btn-secondary" (click)="triggerFileUpload()">
           <span class="btn-icon">📂</span>
-          My Documents
+          Edit Existing Doc
         </button>
+        <input type="file" #fileInput (change)="infoFile($event)" style="display: none" accept=".pdf, .docx">
       </div>
     </div>
 
@@ -63,7 +64,7 @@
   <section class="why-choose-us">
     <div class="why-content">
       <h2>Why Choose Our Editor?</h2>
-      
+
       <div class="benefits-list">
         <div class="benefit-item">
           <div class="benefit-icon">🔒</div>
@@ -103,7 +104,7 @@
   <!-- Format Support Section -->
   <section class="formats">
     <h2>Supported Formats</h2>
-    
+
     <div class="format-cards">
       <div class="format-card">
         <div class="format-icon">📄</div>

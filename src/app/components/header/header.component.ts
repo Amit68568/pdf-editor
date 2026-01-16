@@ -12,22 +12,44 @@ import { Router } from '@angular/router';
 export class HeaderComponent {
   createOpen = false;
   convertOpen = false;
+  editOpen = false;
 
-  constructor(private router: Router) {}
+  constructor(private router: Router) { }
 
-  toggleCreate() {
-    this.createOpen = !this.createOpen;
+  openCreate() {
+    this.createOpen = true;
+    this.convertOpen = false;
+    this.editOpen = false;
+  }
+
+  closeCreate() {
+    this.createOpen = false;
+  }
+
+  openConvert() {
+    this.convertOpen = true;
+    this.createOpen = false;
+    this.editOpen = false;
+  }
+
+  closeConvert() {
     this.convertOpen = false;
   }
 
-  toggleConvert() {
-    this.convertOpen = !this.convertOpen;
+  openEdit() {
+    this.editOpen = true;
     this.createOpen = false;
+    this.convertOpen = false;
+  }
+
+  closeEdit() {
+    this.editOpen = false;
   }
 
   closeMenus() {
     this.createOpen = false;
     this.convertOpen = false;
+    this.editOpen = false;
   }
 
   // Create actions
@@ -43,6 +65,32 @@ export class HeaderComponent {
 
   createNewPpt() {
     this.router.navigate(['/create'], { queryParams: { type: 'ppt' } });
+    this.closeMenus();
+  }
+
+  // Edit actions (Placeholders)
+  editPdf() {
+    console.log('Edit PDF clicked');
+    this.closeMenus();
+  }
+
+  editDoc() {
+    console.log('Edit Doc clicked');
+    this.closeMenus();
+  }
+
+  editPpt() {
+    console.log('Edit PPT clicked');
+    this.closeMenus();
+  }
+
+  mergePdf() {
+    console.log('Merge PDF clicked');
+    this.closeMenus();
+  }
+
+  splitPdf() {
+    console.log('Split PDF clicked');
     this.closeMenus();
   }
 
@@ -79,11 +127,6 @@ export class HeaderComponent {
 
   goHome() {
     this.router.navigate(['/']);
-    this.closeMenus();
-  }
-
-  goToDocuments() {
-    this.router.navigate(['/documents']);
     this.closeMenus();
   }
 }

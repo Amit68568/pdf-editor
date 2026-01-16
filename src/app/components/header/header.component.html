@@ -1,58 +1,132 @@
 <header class="app-header" (click)="closeMenus()">
+  <div class="glass-overlay"></div>
   <div class="header-container">
     <!-- Logo / Brand -->
     <div class="brand" (click)="goHome()">
-      <div class="logo">📄</div>
-      <h1>DocEditor</h1>
+      <div class="logo-wrapper">
+        <span class="logo">📄</span>
+      </div>
+      <h1 class="brand-text">DocEditor</h1>
     </div>
 
     <!-- Navigation Menu -->
     <nav class="nav-menu">
       <!-- Create Dropdown -->
-      <div class="menu-item dropdown" (click)="$event.stopPropagation()">
-        <button class="menu-btn" (click)="toggleCreate()">
+      <div class="menu-item dropdown" (mouseenter)="openCreate()" (mouseleave)="closeCreate()">
+        <button class="menu-btn" [class.active]="createOpen">
           Create
           <span class="chevron" [class.open]="createOpen">▼</span>
         </button>
         <div class="dropdown-menu" [class.open]="createOpen">
           <button class="dropdown-item" (click)="createNewPdf()">
-            <span class="icon">📄</span>
-            <span>New PDF</span>
+            <span class="icon-wrapper">📄</span>
+            <div class="item-content">
+              <span class="item-title">New PDF</span>
+              <span class="item-desc">Create from scratch</span>
+            </div>
           </button>
           <button class="dropdown-item" (click)="createNewWord()">
-            <span class="icon">📋</span>
-            <span>New Word Document</span>
+            <span class="icon-wrapper">📋</span>
+            <div class="item-content">
+              <span class="item-title">New Word</span>
+              <span class="item-desc">Write a document</span>
+            </div>
           </button>
           <button class="dropdown-item" (click)="createNewPpt()">
-            <span class="icon">📊</span>
-            <span>New PowerPoint</span>
+            <span class="icon-wrapper">📊</span>
+            <div class="item-content">
+              <span class="item-title">New PowerPoint</span>
+              <span class="item-desc">Design a presentation</span>
+            </div>
+          </button>
+        </div>
+      </div>
+
+      <!-- Edit Dropdown -->
+      <div class="menu-item dropdown" (mouseenter)="openEdit()" (mouseleave)="closeEdit()">
+        <button class="menu-btn" [class.active]="editOpen">
+          Edit
+          <span class="chevron" [class.open]="editOpen">▼</span>
+        </button>
+        <div class="dropdown-menu" [class.open]="editOpen">
+          <button class="dropdown-item" (click)="editPdf()">
+            <span class="icon-wrapper">fv</span>
+            <div class="item-content">
+              <span class="item-title">Edit PDF</span>
+              <span class="item-desc">Modify content</span>
+            </div>
+          </button>
+          <button class="dropdown-item" (click)="editDoc()">
+            <span class="icon-wrapper">📝</span>
+            <div class="item-content">
+              <span class="item-title">Edit Doc</span>
+              <span class="item-desc">Edit Word documents</span>
+            </div>
+          </button>
+          <button class="dropdown-item" (click)="editPpt()">
+            <span class="icon-wrapper">📽️</span>
+            <div class="item-content">
+              <span class="item-title">Edit PPT</span>
+              <span class="item-desc">Edit presentations</span>
+            </div>
+          </button>
+          <button class="dropdown-item" (click)="mergePdf()">
+            <span class="icon-wrapper">🔗</span>
+            <div class="item-content">
+              <span class="item-title">Merge PDFs</span>
+              <span class="item-desc">Combine files</span>
+            </div>
+          </button>
+          <button class="dropdown-item" (click)="splitPdf()">
+            <span class="icon-wrapper">✂️</span>
+            <div class="item-content">
+              <span class="item-title">Split PDF</span>
+              <span class="item-desc">Separate pages</span>
+            </div>
           </button>
         </div>
       </div>
 
       <!-- Convert Dropdown -->
-      <div class="menu-item dropdown" (click)="$event.stopPropagation()">
-        <button class="menu-btn" (click)="toggleConvert()">
+      <div class="menu-item dropdown" (mouseenter)="openConvert()" (mouseleave)="closeConvert()">
+        <button class="menu-btn" [class.active]="convertOpen">
           Convert
           <span class="chevron" [class.open]="convertOpen">▼</span>
         </button>
         <div class="dropdown-menu" [class.open]="convertOpen">
-          <button class="dropdown-item" (click)="convertPdfToWord()">Convert PDF to Word</button>
-          <button class="dropdown-item" (click)="convertWordToPdf()">Convert Word to PDF</button>
-          <button class="dropdown-item" (click)="convertPdfToJpg()">Convert PDF to JPG</button>
-          <button class="dropdown-item" (click)="convertPdfToPng()">Convert PDF to PNG</button>
-          <button class="dropdown-item" (click)="convertPdfToExcel()">Convert PDF to Excel</button>
-          <button class="dropdown-item" (click)="convertPdfToPpt()">Convert PDF to PPT</button>
+          <button class="dropdown-item" (click)="convertPdfToWord()">
+            <span class="icon-wrapper">🔄</span>
+            <span>Convert PDF to Word</span>
+          </button>
+          <button class="dropdown-item" (click)="convertWordToPdf()">
+            <span class="icon-wrapper">🔄</span>
+            <span>Convert Word to PDF</span>
+          </button>
+          <button class="dropdown-item" (click)="convertPdfToJpg()">
+            <span class="icon-wrapper">🖼️</span>
+            <span>Convert PDF to JPG</span>
+          </button>
+          <button class="dropdown-item" (click)="convertPdfToPng()">
+            <span class="icon-wrapper">🖼️</span>
+            <span>Convert PDF to PNG</span>
+          </button>
+          <button class="dropdown-item" (click)="convertPdfToExcel()">
+            <span class="icon-wrapper">📊</span>
+            <span>Convert PDF to Excel</span>
+          </button>
+          <button class="dropdown-item" (click)="convertPdfToPpt()">
+            <span class="icon-wrapper">📽️</span>
+            <span>Convert PDF to PPT</span>
+          </button>
         </div>
       </div>
 
-      <!-- Documents Link -->
-      <button class="menu-btn" (click)="goToDocuments()">My Documents</button>
+
     </nav>
 
     <!-- Right Actions -->
     <div class="header-actions">
-      <button class="sign-in-btn">Sign in</button>
+      <button class="sign-in-btn">Sign In</button>
     </div>
   </div>
 </header>

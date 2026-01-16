@@ -50,13 +50,22 @@ export class HomeComponent {
     { number: 'Free', label: 'Forever' }
   ];
 
-  constructor(private router: Router) {}
+  constructor(private router: Router) { }
 
   navigateToCreate() {
     this.router.navigate(['/create']);
   }
 
-  navigateToDocuments() {
-    this.router.navigate(['/documents']);
+  triggerFileUpload() {
+    const fileInput = document.querySelector('input[type="file"]') as HTMLElement;
+    fileInput?.click();
+  }
+
+  infoFile(event: any) {
+    const file = event.target.files[0];
+    if (file) {
+      console.log('File selected:', file.name);
+      // Logic to handle file edit
+    }
   }
 }
