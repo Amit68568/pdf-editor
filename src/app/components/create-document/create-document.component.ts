@@ -53,7 +53,7 @@ export class CreateDocumentComponent {
     this.isSaving = true;
     const newDoc: Partial<Document> = {
       name: this.documentTitle,
-      type: this.documentType === 'ppt' ? 'doc' : (this.documentType as 'pdf' | 'doc'),
+      type: this.documentType,
       content: this.documentContent || `# ${this.documentTitle}\n\nStart typing here...`
     };
 
@@ -74,7 +74,7 @@ export class CreateDocumentComponent {
   }
 
   goBack() {
-    this.router.navigate(['/documents']);
+    this.router.navigate(['/']);
   }
 
   updateTitle(event: Event) {

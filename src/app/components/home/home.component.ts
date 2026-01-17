@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
+import { DocumentService } from '../../services/document.service';
 
 @Component({
   selector: 'app-home',
@@ -50,7 +51,10 @@ export class HomeComponent {
     { number: 'Free', label: 'Forever' }
   ];
 
-  constructor(private router: Router) { }
+  constructor(
+    private router: Router,
+    private documentService: DocumentService
+  ) { }
 
   navigateToCreate() {
     this.router.navigate(['/create']);
@@ -64,8 +68,17 @@ export class HomeComponent {
   infoFile(event: any) {
     const file = event.target.files[0];
     if (file) {
-      console.log('File selected:', file.name);
-      // Logic to handle file edit
+      const type = file.name.endsWith('.pdf') ? 'pdf' : file.name.endsWith('.pptx') || file.name.endsWith('.ppt') ? 'ppt' : 'doc';
+
+      this.documentService.uploadDocument(file, type).subscribe({
+        next: (doc) => {
+          this.router.navigate(['/editor', doc.id]);
+        },
+        error: (err) => {
+          console.error('Error uploading file:', err);
+          alert('Failed to upload file');
+        }
+      });
     }
   }
 }

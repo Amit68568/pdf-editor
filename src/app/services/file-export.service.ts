@@ -134,8 +134,7 @@ export class FileExportService {
         }]
       });
 
-      const buffer = await Packer.toBuffer(doc);
-      const blob = new Blob([buffer as unknown as BlobPart], { type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' });
+      const blob = await Packer.toBlob(doc);
       this.downloadBlob(blob, `${fileName}.docx`);
 
     } catch (error) {

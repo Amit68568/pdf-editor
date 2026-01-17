@@ -7,11 +7,13 @@ import { StorageService, Document } from '../../services/storage.service';
 import { FileExportService } from '../../services/file-export.service';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
+import { CKEditorModule } from '@ckeditor/ckeditor5-angular';
+import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
 
 @Component({
   selector: 'app-editor',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, CKEditorModule],
   templateUrl: './editor.component.html',
   styleUrl: './editor.component.scss'
 })
@@ -25,13 +27,24 @@ export class EditorComponent implements OnInit, OnDestroy {
   successMessage: string | null = null;
   private destroy$ = new Subject<void>();
 
+  public Editor = ClassicEditor;
+  public config = {
+    toolbar: [
+      'heading', '|',
+      'bold', 'italic', 'link', 'bulletedList', 'numberedList', 'blockQuote', '|',
+      'insertTable', '|',
+      'undo', 'redo'
+    ],
+    placeholder: 'Start writing your document...'
+  };
+
   constructor(
     private documentService: DocumentService,
     private storageService: StorageService,
     private fileExportService: FileExportService,
     private route: ActivatedRoute,
     private router: Router
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     const id = this.route.snapshot.paramMap.get('id');
@@ -104,56 +117,28 @@ export class EditorComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Export document as PDF using pdf-lib
+   * Download document to local device
    */
-  async exportAsPdf(): Promise<void> {
+  async downloadDocument(): Promise<void> {
     if (!this.document) return;
 
     this.isExporting = true;
     try {
-      await this.fileExportService.exportAsPdf(this.document.name, this.editingContent);
-      this.successMessage = 'PDF exported successfully!';
+      const baseName = this.document.name.replace(/\.(pdf|docx?|pptx?)$/i, '');
+
+      if (this.document.type === 'pdf') {
+        await this.fileExportService.exportAsPdf(baseName, this.editingContent);
+      } else {
+        // For 'doc' and 'ppt' 
+        await this.fileExportService.exportAsDocx(baseName, this.editingContent);
+      }
+      this.successMessage = 'File downloaded successfully!';
       setTimeout(() => this.successMessage = null, 3000);
     } catch (error) {
-      this.errorMessage = 'Failed to export PDF';
-      console.error('Error exporting PDF:', error);
+      this.errorMessage = 'Failed to download file';
+      console.error('Error downloading file:', error);
     } finally {
       this.isExporting = false;
-    }
-  }
-
-  /**
-   * Export document as DOCX using docx library
-   */
-  async exportAsDocx(): Promise<void> {
-    if (!this.document) return;
-
-    this.isExporting = true;
-    try {
-      await this.fileExportService.exportAsDocx(this.document.name, this.editingContent);
-      this.successMessage = 'Word document exported successfully!';
-      setTimeout(() => this.successMessage = null, 3000);
-    } catch (error) {
-      this.errorMessage = 'Failed to export Word document';
-      console.error('Error exporting DOCX:', error);
-    } finally {
-      this.isExporting = false;
-    }
-  }
-
-  /**
-   * Export as text
-   */
-  exportAsText(): void {
-    if (!this.document) return;
-
-    try {
-      this.fileExportService.exportAsText(this.document.name, this.editingContent);
-      this.successMessage = 'Text file exported successfully!';
-      setTimeout(() => this.successMessage = null, 3000);
-    } catch (error) {
-      this.errorMessage = 'Failed to export text file';
-      console.error('Error exporting text:', error);
     }
   }
 
@@ -161,7 +146,7 @@ export class EditorComponent implements OnInit, OnDestroy {
    * Navigate back to documents list
    */
   goBack(): void {
-    this.router.navigate(['/documents']);
+    this.router.navigate(['/']);
   }
 }
 

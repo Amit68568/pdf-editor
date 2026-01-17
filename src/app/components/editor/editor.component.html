@@ -8,13 +8,12 @@
     </div>
     <div class="header-actions">
       <button class="action-btn save" (click)="saveDocument()" [disabled]="isSaving" title="Save changes">
-        {{ isSaving ? '⟳' : '💾' }}
+        <span class="btn-icon">💾</span>
+        Save
       </button>
-      <button class="action-btn export" (click)="exportAsPdf()" [disabled]="!document" title="Export as PDF">
-        📄 PDF
-      </button>
-      <button class="action-btn export" (click)="exportAsDocx()" [disabled]="!document" title="Export as Word">
-        📋 DOCX
+      <button class="action-btn download" (click)="downloadDocument()" [disabled]="!document" title="Download to local">
+        <span class="btn-icon">📥</span>
+        Download
       </button>
     </div>
   </div>
@@ -33,12 +32,9 @@
       <p>Loading document...</p>
     </div>
 
-    <textarea
-      *ngIf="!isLoading && document"
-      class="editor-textarea"
-      [(ngModel)]="editingContent"
-      placeholder="Start editing your document..."
-      spellcheck="true"
-    ></textarea>
+    <div class="editor-wrapper" *ngIf="!isLoading && document">
+      <ckeditor [editor]="Editor" [config]="config" [(ngModel)]="editingContent">
+      </ckeditor>
+    </div>
   </div>
 </div>

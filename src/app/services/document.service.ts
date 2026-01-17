@@ -9,7 +9,7 @@ export class DocumentService {
   private currentDocument = new BehaviorSubject<Document | null>(null);
   currentDocument$ = this.currentDocument.asObservable();
 
-  constructor(private storageService: StorageService) {}
+  constructor(private storageService: StorageService) { }
 
   /**
    * Fetch all documents from local storage
@@ -49,7 +49,7 @@ export class DocumentService {
   /**
    * Upload a document file
    */
-  uploadDocument(file: File, type: 'pdf' | 'doc'): Observable<Document> {
+  uploadDocument(file: File, type: 'pdf' | 'doc' | 'ppt'): Observable<Document> {
     return this.storageService.uploadDocument(file, type);
   }
 

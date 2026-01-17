@@ -4,7 +4,7 @@ import { BehaviorSubject, Observable, of } from 'rxjs';
 export interface Document {
   id: string;
   name: string;
-  type: 'pdf' | 'doc';
+  type: 'pdf' | 'doc' | 'ppt';
   content?: string;
   createdAt: Date;
   updatedAt: Date;
@@ -118,7 +118,7 @@ export class StorageService {
     return of(void 0);
   }
 
-  uploadDocument(file: File, type: 'pdf' | 'doc'): Observable<Document> {
+  uploadDocument(file: File, type: 'pdf' | 'doc' | 'ppt'): Observable<Document> {
     return new Observable(observer => {
       const reader = new FileReader();
 
