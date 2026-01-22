@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, ViewChild, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -8,7 +8,30 @@ import { FileExportService } from '../../services/file-export.service';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { CKEditorModule } from '@ckeditor/ckeditor5-angular';
-import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
+import {
+  ClassicEditor,
+  Bold,
+  Italic,
+  Underline,
+  Strikethrough,
+  Subscript,
+  Superscript,
+  Font,
+  Alignment,
+  Essentials,
+  Paragraph,
+  RemoveFormat,
+  List,
+  TodoList,
+  Indent,
+  Link,
+  BlockQuote,
+  Table,
+  TableToolbar,
+  HorizontalLine,
+  Autoformat,
+  Undo
+} from 'ckeditor5';
 
 @Component({
   selector: 'app-editor',
@@ -18,6 +41,8 @@ import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
   styleUrl: './editor.component.scss'
 })
 export class EditorComponent implements OnInit, OnDestroy {
+  @ViewChild('editorToolbar') editorToolbar!: ElementRef;
+
   document: Document | null = null;
   editingContent: string = '';
   isLoading = false;
@@ -28,15 +53,33 @@ export class EditorComponent implements OnInit, OnDestroy {
   private destroy$ = new Subject<void>();
 
   public Editor = ClassicEditor;
+
   public config = {
+    licenseKey: 'GPL',
+    plugins: [
+      Essentials, Paragraph, Bold, Italic, Underline, Strikethrough, Subscript, Superscript,
+      Font, Alignment, RemoveFormat, List, TodoList, Indent, Link, BlockQuote,
+      Table, TableToolbar, HorizontalLine, Autoformat, Undo
+    ],
     toolbar: [
       'heading', '|',
-      'bold', 'italic', 'link', 'bulletedList', 'numberedList', 'blockQuote', '|',
-      'insertTable', '|',
+      'fontSize', 'fontFamily', 'fontColor', 'fontBackgroundColor', '|',
+      'bold', 'italic', 'underline', 'strikethrough', 'subscript', 'superscript', 'removeFormat', '|',
+      'alignment', '|',
+      'bulletedList', 'numberedList', 'todoList', '|',
+      'outdent', 'indent', '|',
+      'link', 'blockQuote', 'insertTable', 'horizontalLine', '|',
       'undo', 'redo'
     ],
     placeholder: 'Start writing your document...'
   };
+
+  // Editor Toolbar State
+  zoomLevel: number = 100;
+  currentPage: number = 1;
+  totalPages: number = 1;
+  isFullScreen: boolean = false;
+  private readonly A4_HEIGHT_PX = 1056;
 
   constructor(
     private documentService: DocumentService,
@@ -44,7 +87,10 @@ export class EditorComponent implements OnInit, OnDestroy {
     private fileExportService: FileExportService,
     private route: ActivatedRoute,
     private router: Router
-  ) { }
+  ) {
+    // Listen to scroll events to update current page
+    window.addEventListener('scroll', this.onScroll.bind(this));
+  }
 
   ngOnInit(): void {
     const id = this.route.snapshot.paramMap.get('id');
@@ -56,6 +102,53 @@ export class EditorComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.complete();
+    window.removeEventListener('scroll', this.onScroll.bind(this));
+  }
+
+  /**
+   * Update page statistics based on content and scroll
+   */
+  private updatePageStats(): void {
+    // Estimate total pages based on content length or scroll height
+    // Since CKEditor grows, we can use the document height approximation
+    const editorElement = document.querySelector('.ck-content');
+    if (editorElement) {
+      const height = editorElement.getBoundingClientRect().height;
+      this.totalPages = Math.max(1, Math.ceil(height / this.A4_HEIGHT_PX));
+    }
+  }
+
+  private onScroll(): void {
+    const scrollY = window.scrollY;
+    // Offset by header/toolbar height approx 150px
+    this.currentPage = Math.max(1, Math.ceil((scrollY + 200) / (this.A4_HEIGHT_PX * (this.zoomLevel / 100))));
+    this.updatePageStats();
+  }
+
+  // Hook into content changes to update stats
+  onContentChange(): void {
+    // Debounce or just call update
+    setTimeout(() => this.updatePageStats(), 100);
+  }
+
+  onEditorReady(editor: any): void {
+    // Merge the custom toolbar items into the main CKEditor toolbar
+    const toolbarElement = editor.ui.view.toolbar.element;
+    // The items list is usually a flex container inside
+    const itemsContainer = toolbarElement.querySelector('.ck-toolbar__items');
+    const myToolbar = this.editorToolbar.nativeElement;
+
+    if (itemsContainer && myToolbar) {
+      // Append our toolbar controls to the end of the existing items
+      itemsContainer.appendChild(myToolbar);
+    }
+  }
+
+  /**
+   * Navigate back to documents list
+   */
+  goBack(): void {
+    this.router.navigate(['/']);
   }
 
   /**
@@ -124,7 +217,21 @@ export class EditorComponent implements OnInit, OnDestroy {
 
     this.isExporting = true;
     try {
-      const baseName = this.document.name.replace(/\.(pdf|docx?|pptx?)$/i, '');
+      let baseName = this.document.name.replace(/\.(pdf|docx?|pptx?)$/i, '');
+      const userInput = prompt('Enter file name to download:', baseName);
+
+      if (userInput === null) {
+        this.isExporting = false;
+        return; // User cancelled
+      }
+
+      baseName = userInput.trim() || baseName;
+
+      // Optionally update document name if changed
+      if (baseName !== this.document.name) {
+        this.document.name = baseName;
+        this.saveDocument();
+      }
 
       if (this.document.type === 'pdf') {
         await this.fileExportService.exportAsPdf(baseName, this.editingContent);
@@ -142,11 +249,24 @@ export class EditorComponent implements OnInit, OnDestroy {
     }
   }
 
-  /**
-   * Navigate back to documents list
-   */
-  goBack(): void {
-    this.router.navigate(['/']);
+
+
+  toggleFullScreen(): void {
+    try {
+      this.isFullScreen = !this.isFullScreen;
+      console.log('Fullscreen toggled to:', this.isFullScreen);
+
+      // Update stats safely
+      setTimeout(() => {
+        try {
+          this.updatePageStats();
+        } catch (e) {
+          console.warn('Error updating page stats:', e);
+        }
+      }, 100);
+    } catch (err) {
+      console.error('Error toggling fullscreen:', err);
+    }
   }
 }
 

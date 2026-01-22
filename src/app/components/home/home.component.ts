@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { DocumentService } from '../../services/document.service';
+import { StorageService } from '../../services/storage.service';
 
 @Component({
   selector: 'app-home',
@@ -53,11 +54,18 @@ export class HomeComponent {
 
   constructor(
     private router: Router,
-    private documentService: DocumentService
+    private documentService: DocumentService,
+    private storageService: StorageService
   ) { }
 
   navigateToCreate() {
-    this.router.navigate(['/create']);
+    this.storageService.createDocument({
+      name: 'Untitled PDF',
+      type: 'pdf',
+      content: ''
+    }).subscribe(doc => {
+      this.router.navigate(['/editor', doc.id]);
+    });
   }
 
   triggerFileUpload() {

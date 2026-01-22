@@ -2,6 +2,8 @@ import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 
+import { StorageService, Document } from '../../services/storage.service';
+
 @Component({
   selector: 'app-header',
   standalone: true,
@@ -14,7 +16,10 @@ export class HeaderComponent {
   convertOpen = false;
   editOpen = false;
 
-  constructor(private router: Router) { }
+  constructor(
+    private router: Router,
+    private storageService: StorageService
+  ) { }
 
   openCreate() {
     this.createOpen = true;
@@ -54,18 +59,26 @@ export class HeaderComponent {
 
   // Create actions
   createNewPdf() {
-    this.router.navigate(['/create'], { queryParams: { type: 'pdf' } });
-    this.closeMenus();
+    this.createAndNavigate('Untitled PDF', 'pdf');
   }
 
   createNewWord() {
-    this.router.navigate(['/create'], { queryParams: { type: 'doc' } });
-    this.closeMenus();
+    this.createAndNavigate('Untitled Document', 'doc');
   }
 
   createNewPpt() {
-    this.router.navigate(['/create'], { queryParams: { type: 'ppt' } });
-    this.closeMenus();
+    this.createAndNavigate('Untitled Presentation', 'ppt');
+  }
+
+  private createAndNavigate(name: string, type: 'pdf' | 'doc' | 'ppt') {
+    this.storageService.createDocument({
+      name: name,
+      type: type,
+      content: ''
+    }).subscribe(doc => {
+      this.closeMenus();
+      this.router.navigate(['/editor', doc.id]);
+    });
   }
 
   // Edit actions (Placeholders)

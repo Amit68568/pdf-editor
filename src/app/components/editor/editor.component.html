@@ -1,9 +1,10 @@
-<div class="editor-container">
+<div class="editor-container" [class.maximized]="isFullScreen">
   <!-- Header -->
   <div class="editor-header">
     <button class="back-btn" (click)="goBack()" title="Go back">←</button>
     <div class="header-title">
-      <h1 *ngIf="document">{{ document.name }}</h1>
+      <input *ngIf="document" [(ngModel)]="document.name" (blur)="saveDocument()" class="title-input"
+        placeholder="Untitled Document">
       <p *ngIf="document" class="doc-type" [ngClass]="document.type">{{ document.type.toUpperCase() }}</p>
     </div>
     <div class="header-actions">
@@ -14,6 +15,26 @@
       <button class="action-btn download" (click)="downloadDocument()" [disabled]="!document" title="Download to local">
         <span class="btn-icon">📥</span>
         Download
+      </button>
+    </div>
+  </div>
+
+  <!-- Top Toolbar -->
+  <div class="editor-toolbar" #editorToolbar>
+    <div class="zoom-controls">
+      <input type="range" min="50" max="150" step="10" [(ngModel)]="zoomLevel">
+      <span class="zoom-label">{{ zoomLevel }}%</span>
+    </div>
+
+    <div class="page-controls">
+      <span class="page-count">Pages {{ currentPage }} / {{ totalPages }}</span>
+    </div>
+
+    <div class="screen-controls">
+      <button class="icon-btn" (click)="toggleFullScreen()"
+        [title]="isFullScreen ? 'Exit Full Screen' : 'Enter Full Screen'">
+        <span *ngIf="!isFullScreen">⤢ Full Screen</span>
+        <span *ngIf="isFullScreen" style="color: #ef4444;">✕ Exit Full Screen</span>
       </button>
     </div>
   </div>
@@ -33,8 +54,15 @@
     </div>
 
     <div class="editor-wrapper" *ngIf="!isLoading && document">
-      <ckeditor [editor]="Editor" [config]="config" [(ngModel)]="editingContent">
-      </ckeditor>
+      <div class="zoom-container">
+        <!-- DEBUG INFO -->
+
+
+        <!-- Zoom handled via CSS variable in component -->
+        <ckeditor [editor]="Editor" [config]="config" [(ngModel)]="editingContent" (change)="onContentChange()"
+          (ready)="onEditorReady($event)" [style.--editor-zoom]="zoomLevel / 100">
+        </ckeditor>
+      </div>
     </div>
   </div>
 </div>

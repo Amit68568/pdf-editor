@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
-import { PDFDocument, PDFPage, rgb } from 'pdf-lib';
 import { Document as DocxDocument, Packer, Paragraph, TextRun, Table, TableRow, TableCell, WidthType, BorderStyle, ShadingType } from 'docx';
+// @ts-ignore
+import html2pdf from 'html2pdf.js';
 
 @Injectable({
   providedIn: 'root'
@@ -8,65 +9,36 @@ import { Document as DocxDocument, Packer, Paragraph, TextRun, Table, TableRow, 
 export class FileExportService {
 
   /**
-   * Export document content as PDF
+   * Export document content as PDF (WYSIWYG)
+   * Uses html2pdf.js to preserve formatting, fonts, and colors.
    */
   async exportAsPdf(fileName: string, content: string): Promise<void> {
     try {
-      const pdfDoc = await PDFDocument.create();
-      let page = pdfDoc.addPage([612, 792]); // Letter size
-      const { height } = page.getSize();
-      let y = height - 50;
+      // Create a temporary container for formatting
+      const element = document.createElement('div');
+      element.innerHTML = content;
 
-      // Add title
-      page.drawText(fileName, {
-        x: 50,
-        y: y,
-        size: 14,
-        color: rgb(0, 0, 0)
-      });
+      // Apply basic styling to ensure it looks good in PDF
+      // A4 is roughly 210mm x 297mm. 
+      // html2pdf usually handles 1px = 1/96 (default) or similar.
+      // We set a width to simulate the editor content width.
+      element.style.width = '100%';
+      element.style.padding = '20px';
+      element.style.fontFamily = 'Arial, Helvetica, sans-serif'; // Default fallbacks
+      element.style.lineHeight = '1.5';
 
-      y -= 30;
+      // Ensure images are accessible (if any)
 
-      // Add content with word wrapping
-      const lines = content.split('\n');
-      const pageHeight = height - 100;
-      const lineHeight = 15;
-      const maxCharsPerLine = 90;
+      const opt: any = {
+        margin: 0.5, // 0.5 inch margin
+        filename: `${fileName}.pdf`,
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { scale: 2, useCORS: true, logging: true },
+        jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
+      };
 
-      for (const line of lines) {
-        // Word wrap if line is too long
-        const wrappedLines = this.wrapText(line, maxCharsPerLine);
-
-        for (const wrappedLine of wrappedLines) {
-          if (y < 50) {
-            page = pdfDoc.addPage([612, 792]);
-            y = height - 50;
-          }
-
-          page.drawText(wrappedLine, {
-            x: 50,
-            y: y,
-            size: 11,
-            color: rgb(0, 0, 0)
-          });
-
-          y -= lineHeight;
-        }
-
-        y -= 5; // Extra space between paragraphs
-      }
-
-      // Add timestamp
-      const timestamp = new Date().toLocaleString();
-      page.drawText(`Generated on: ${timestamp}`, {
-        x: 50,
-        y: 30,
-        size: 9,
-        color: rgb(100, 100, 100)
-      });
-
-      const pdfBytes = await pdfDoc.save();
-      this.downloadFile(pdfBytes, `${fileName}.pdf`, 'application/pdf');
+      // Generate and save
+      await html2pdf().set(opt).from(element).save();
 
     } catch (error) {
       console.error('Error exporting PDF:', error);
@@ -81,20 +53,9 @@ export class FileExportService {
     try {
       const paragraphs: Paragraph[] = [];
 
-      // Add title
-      paragraphs.push(
-        new Paragraph({
-          text: fileName,
-          run: {
-            bold: true,
-            size: 28,
-          },
-          spacing: { after: 400 }
-        })
-      );
-
       // Add content
-      const lines = content.split('\n');
+      const plainText = this.stripHtml(content);
+      const lines = plainText.split('\n');
       for (const line of lines) {
         if (line.trim()) {
           paragraphs.push(
@@ -147,7 +108,8 @@ export class FileExportService {
    * Export document content as plain text
    */
   exportAsText(fileName: string, content: string): void {
-    const text = `${fileName}\n${'='.repeat(fileName.length)}\n\n${content}\n\nGenerated on: ${new Date().toLocaleString()}`;
+    const plainText = this.stripHtml(content);
+    const text = `${plainText}\n\nGenerated on: ${new Date().toLocaleString()}`;
     const blob = new Blob([text], { type: 'text/plain' });
     this.downloadBlob(blob, `${fileName}.txt`);
   }
@@ -156,7 +118,9 @@ export class FileExportService {
    * Export as Markdown
    */
   exportAsMarkdown(fileName: string, content: string): void {
-    const markdown = `# ${fileName}\n\n${content}\n\n---\n*Generated on: ${new Date().toLocaleString()}*`;
+    // Basic HTML to Markdown conversion (just strip tags for now to match other formats)
+    const plainText = this.stripHtml(content);
+    const markdown = `${plainText}\n\n---\n*Generated on: ${new Date().toLocaleString()}*`;
     const blob = new Blob([markdown], { type: 'text/markdown' });
     this.downloadBlob(blob, `${fileName}.md`);
   }
@@ -178,37 +142,33 @@ export class FileExportService {
   }
 
   /**
-   * Helper: Wrap text to fit line width
+   * Helper: Strip HTML tags to get plain text
+   * Improved Regex approach for better layout preservation in plain text exports
    */
-  private wrapText(text: string, maxCharsPerLine: number): string[] {
-    const lines: string[] = [];
-    let currentLine = '';
+  private stripHtml(html: string): string {
+    if (!html) return '';
 
-    const words = text.split(' ');
-    for (const word of words) {
-      if ((currentLine + word).length > maxCharsPerLine) {
-        if (currentLine) {
-          lines.push(currentLine.trim());
-        }
-        currentLine = word + ' ';
-      } else {
-        currentLine += word + ' ';
-      }
-    }
+    // 1. Explicitly replace block tags with newlines
+    let text = html
+      .replace(/<br\s*\/?>/gi, '\n')
+      .replace(/<\/p>/gi, '\n')
+      .replace(/<\/div>/gi, '\n')
+      .replace(/<\/h[1-6]>/gi, '\n')
+      .replace(/<\/li>/gi, '\n')
+      .replace(/<li>/gi, '  • '); // Add bullet point
 
-    if (currentLine) {
-      lines.push(currentLine.trim());
-    }
+    // 2. Strip all remaining HTML tags
+    text = text.replace(/<[^>]+>/g, '');
 
-    return lines.length > 0 ? lines : [text];
-  }
+    // 3. Decode known entities (basic) or use lightweight decoder
+    text = text
+      .replace(/&nbsp;/g, ' ')
+      .replace(/&amp;/g, '&')
+      .replace(/&lt;/g, '<')
+      .replace(/&gt;/g, '>')
+      .replace(/&quot;/g, '"');
 
-  /**
-   * Helper: Download bytes as file
-   */
-  private downloadFile(data: Uint8Array, filename: string, mimeType: string): void {
-    const blob = new Blob([data as unknown as BlobPart], { type: mimeType });
-    this.downloadBlob(blob, filename);
+    return text;
   }
 
   /**
